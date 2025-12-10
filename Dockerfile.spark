@@ -1,0 +1,50 @@
+# Official Spark image
+FROM apache/spark:3.5.1
+
+# Spark-submit in PATH
+ENV PATH="/opt/spark/bin:$PATH"
+
+# Change USER for installing necessary tools and Python dependencies
+USER root
+
+RUN apt-get update && \
+    apt-get install -y curl python3-pip && \
+    pip3 install --no-cache-dir cassandra-driver && \
+    pip3 install kafka-python && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Directory for external jars
+RUN mkdir -p /opt/spark/jars/
+
+# Download required jars and add to the jars folder
+RUN curl -L -o /opt/spark/jars/spark-sql-kafka-0-10_2.12-3.5.1.jar \
+    https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.5.1/spark-sql-kafka-0-10_2.12-3.5.1.jar && \
+    curl -L -o /opt/spark/jars/kafka-clients-3.6.0.jar \
+    https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.6.0/kafka-clients-3.6.0.jar && \
+    curl -L -o /opt/spark/jars/spark-token-provider-kafka-0-10_2.12-3.5.1.jar \
+    https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.5.1/spark-token-provider-kafka-0-10_2.12-3.5.1.jar && \
+    curl -L -o /opt/spark/jars/spark-cassandra-connector-assembly_2.12-3.5.1.jar \
+    https://repo1.maven.org/maven2/com/datastax/spark/spark-cassandra-connector-assembly_2.12/3.5.1/spark-cassandra-connector-assembly_2.12-3.5.1.jar
+
+RUN curl -L -o /opt/spark/jars/commons-pool2-2.11.1.jar \
+    https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.11.1/commons-pool2-2.11.1.jar
+
+# Configure spark by listing jars required on startup
+RUN mkdir -p /opt/spark/conf && \
+    echo "spark.jars \
+    /opt/spark/jars/spark-sql-kafka-0-10_2.12-3.5.1.jar, \
+    /opt/spark/jars/kafka-clients-3.6.0.jar, \
+    /opt/spark/jars/spark-token-provider-kafka-0-10_2.12-3.5.1.jar, \
+    /opt/spark/jars/spark-cassandra-connector-assembly_2.12-3.5.1.jar, \
+    /opt/spark/jars/commons-pool2-2.11.1.jar" \
+    >> /opt/spark/conf/spark-defaults.conf
+
+# Switch back to USER spark
+USER spark
+
+# Set working directory
+WORKDIR /opt/spark/work-dir
+
+# Enter bash on entrypoint
+ENTRYPOINT ["/bin/bash"]
