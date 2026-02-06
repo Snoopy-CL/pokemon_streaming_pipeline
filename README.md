@@ -1,7 +1,7 @@
 # Pokemon Data Streaming Pipeline (Data Engineer Project)
 ## Project Overview
 Pokemon Data Streaming Piepline is an end-to-end data engineering project designed to showcase practical skills and interest in modern data engineering. The project demonstrates hands-on experience with Kafka, Spark Structured Streaming, Cassandra, Airflow, Docker, and API ingestion.
-The pipeline retrieves Pokemon data—restricted to Pokemon available in Pokemon Emerald by continuously generating random Pokemon IDs for 60 seconds after each Airflow DAG trigger. Each generated ID is used to fetch Pokemon data from the PokeAPI, which is streamed to Kafka. Spark consumes the Kafka stream in real time, transforms the data, and writes it to Cassandra. Airflow orchestrates ingestion, and the entire system is containerized with Docker.
+The pipeline retrieves Pokemon data restricted to Pokemon available in Pokemon Emerald by continuously generating random Pokemon IDs for 60 seconds after each Airflow DAG trigger. Each generated ID is used to fetch Pokemon data from the PokeAPI, which is streamed to Kafka. Spark consumes the Kafka stream in real time, transforms the data, and writes it to Cassandra. Airflow orchestrates ingestion, and the entire system is containerized with Docker.
 
 ## Tech Stack
 - Python
